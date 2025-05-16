@@ -3,9 +3,10 @@ import { ButtonHTMLAttributes, useCallback, useEffect, useMemo, useRef, useState
 type Props = {
   defaultWidth?: number;
   defaultHeight?: number;
+  children: React.ReactNode;
 };
 
-export default function ResizableBox({ defaultWidth = 300, defaultHeight = 200 }: Props) {
+export default function ResizableBox({ defaultWidth = 300, defaultHeight = 200, children }: Props) {
   const MIN_HEIGHT = 100;
 
   const MIN_WIDTH = 100;
@@ -137,7 +138,7 @@ export default function ResizableBox({ defaultWidth = 300, defaultHeight = 200 }
       style={containerStyle}
       className={`grid my-[50px] mx-auto grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] place-items-center bg-black`}
     >
-      <div className="col-[2] row-[2] self-stretch justify-self-stretch">1</div>
+      <div className="col-[2] row-[2] self-stretch justify-self-stretch">{children}</div>
       <Resizer
         onPointerDown={(e) => handlePointerDown(e, 'n')}
         className="col-[2] row-[1] transform-[translateY(-50%)] cursor-row-resize"

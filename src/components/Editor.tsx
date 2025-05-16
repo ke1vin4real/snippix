@@ -26,7 +26,7 @@ export default function Editor() {
   }, [code]);
 
   return (
-    <div className="grid h-[300px] w-full">
+    <div className="grid h-full w-full">
       <div
         className="col-start-1 row-start-1 rounded-lg bg-gray-900 p-4 font-mono text-sm text-white"
         dangerouslySetInnerHTML={{ __html: html }}
