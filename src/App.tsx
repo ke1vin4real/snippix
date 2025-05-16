@@ -1,9 +1,8 @@
-import Editor from '@/components/Editor';
-
+import ResizableBox from '@/components/ResizableBox';
 function App() {
   return (
     <>
-      <Editor />
+      <ResizableBox />
     </>
   );
 }
