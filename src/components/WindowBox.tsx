@@ -31,7 +31,7 @@ export default function WindowBox({ type, children }: Props) {
   } else if (type === 'MAC') {
     return (
       <div
-        className={`select-none h-full w-full rounded-lg bg-gradient-to-b from-white/80 to-[#f8f8f8]/80 dark:from-[#3c4048]/90 dark:to-[#32363e]/90 shadow-[0_20px_40px_rgba(0,0,0,0.15),0_8px_16px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3),0_8px_16px_rgba(0,0,0,0.2)] border-[1px] border-solid border-[rgba(255,255,255,0.2)] dark:border-[rgba(255,255,255,0.1)]`}
+        className={`select-none h-full w-full rounded-lg bg-[linear-gradient(180deg,rgba(255,255,255,0.8)_0%,rgba(248,248,248,0.8)_100%)] dark:bg-[linear-gradient(180deg,rgba(60,64,72,0.9)_0%,rgba(50,54,62,0.9)_100%)] shadow-[0_20px_40px_rgba(0,0,0,0.15),0_8px_16px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.3),0_8px_16px_rgba(0,0,0,0.2)] border-[1px] border-solid border-[rgba(255,255,255,0.2)] dark:border-[rgba(255,255,255,0.1)]`}
       >
         <div
           className={`h-[52px] flex gap-[8px] items-center pl-[15px] border-b-[1px] border-solid border-[rgba(0,0,0,0.1)] dark:border-b-[rgba(255,255,255,0.1)]`}
