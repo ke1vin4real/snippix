@@ -1,12 +1,12 @@
 import { ButtonHTMLAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-type Props = {
+interface Props {
   defaultWidth?: number;
   defaultHeight?: number;
   children: React.ReactNode;
-};
+}
 
-export default function ResizableBox({ defaultWidth = 300, defaultHeight = 200, children }: Props) {
+export default function ResizableBox({ defaultWidth = 300, defaultHeight = 300, children }: Props) {
   const MIN_HEIGHT = 100;
 
   const MIN_WIDTH = 100;

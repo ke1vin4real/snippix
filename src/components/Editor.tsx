@@ -140,7 +140,7 @@ export default function Editor({ language, theme }: Props) {
   return (
     <div className="grid h-full w-full">
       <div
-        className="col-start-1 row-start-1 rounded-lg bg-gray-900 p-4 font-mono text-sm text-white"
+        className="col-start-1 row-start-1 bg-gray-900 p-4 font-mono text-sm text-white"
         dangerouslySetInnerHTML={{ __html: highlightedCode }}
       />
       <textarea

@@ -6,19 +6,35 @@ import ThemeSelection from '@/components/ThemeSelection';
 import { langugageList } from '@/configs/langugage-list';
 import { themeList } from '@/configs/theme-list';
 import { useCallback, useState } from 'react';
+import WindowBox from './components/WindowBox';
+import WindowDarkSelection from './components/WindowDarkSelection';
+import WindowTypeSelection from './components/WindowTypeSelection';
+
+export type WindowType = 'WINDOWS' | 'MAC' | 'UBUNTU' | 'NONE';
 
 function App() {
   const [language, setLauguage] = useState<string>('javascript');
   const [theme, setTheme] = useState<string>('github-dark');
+  const [isWindowDark, setIsWindowDark] = useState<boolean>(false);
+  const [windowType, setWindowType] = useState<WindowType>('WINDOWS');
 
   const handleLanguageChange = useCallback((language: string) => {
     setLauguage(language);
   }, []);
 
-  const handleThemeChange = useCallback((themem: string) => {
-    setTheme(themem);
+  const handleThemeChange = useCallback((theme: string) => {
+    setTheme(theme);
   }, []);
 
+  const handleWindowDarkChange = useCallback((isDark: string) => {
+    setIsWindowDark(isDark === 'true');
+  }, []);
+
+  const handleWindowTypeChange = useCallback((type: WindowType) => {
+    setWindowType(type);
+  }, []);
+
+  // FIXME: the logo svg needs to be replaced with a better one
   return (
     <div className="flex flex-col h-full bg-[#1e1e1e]">
       <header className="h-[60px] border-b border-[#374151] pl-[40px]">
@@ -29,12 +45,17 @@ function App() {
         <ThemeSelection list={themeList} onChange={handleThemeChange} />
       </header>
       <main className="flex flex-1">
-        <div className="flex-1">
+        <div className={`flex-1 ${isWindowDark ? 'dark' : ''}`}>
           <ResizableBox>
-            <Editor language={language} theme={theme} />
+            <WindowBox type={windowType}>
+              <Editor language={language} theme={theme} />
+            </WindowBox>
           </ResizableBox>
         </div>
-        <aside className="w-[300px] border-l border-[#374151]"></aside>
+        <aside className="w-[300px] border-l border-[#374151]">
+          <WindowTypeSelection onChange={handleWindowTypeChange} />
+          <WindowDarkSelection onChange={handleWindowDarkChange} />
+        </aside>
       </main>
     </div>
   );
