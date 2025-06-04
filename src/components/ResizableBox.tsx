@@ -2,18 +2,13 @@ import { ButtonHTMLAttributes, useCallback, useEffect, useMemo, useRef, useState
 
 interface Props {
   defaultWidth?: number;
-  defaultHeight?: number;
   children: React.ReactNode;
 }
 
-export default function ResizableBox({ defaultWidth = 300, defaultHeight = 300, children }: Props) {
-  const MIN_HEIGHT = 100;
-
+export default function ResizableBox({ defaultWidth = 400, children }: Props) {
   const MIN_WIDTH = 100;
 
   const [width, setWidth] = useState<number>(defaultWidth);
-
-  const [height, setHeight] = useState<number>(defaultHeight);
 
   const resizingState = useRef<'none' | 's' | 'n' | 'w' | 'e'>('none');
 
@@ -35,18 +30,6 @@ export default function ResizableBox({ defaultWidth = 300, defaultHeight = 300, 
     });
   }, []);
 
-  const resizeY = useCallback((movement: number) => {
-    if (frameId.current !== null) return;
-
-    frameId.current = requestAnimationFrame(() => {
-      setHeight((prevHeight) => {
-        const newHeight = prevHeight + movement * 2;
-        return newHeight >= MIN_HEIGHT ? newHeight : prevHeight;
-      });
-      frameId.current = null;
-    });
-  }, []);
-
   const handlers = useMemo(
     () => ({
       move: (e: PointerEvent) => {
@@ -57,10 +40,6 @@ export default function ResizableBox({ defaultWidth = 300, defaultHeight = 300, 
 
         if (resizingState.current === 'w') {
           resizeX(lastPositon.x - e.clientX);
-        } else if (resizingState.current === 's') {
-          resizeY(e.clientY - lastPositon.y);
-        } else if (resizingState.current === 'n') {
-          resizeY(lastPositon.y - e.clientY);
         } else {
           resizeX(e.clientX - lastPositon.x);
         }
@@ -94,7 +73,7 @@ export default function ResizableBox({ defaultWidth = 300, defaultHeight = 300, 
         }
       },
     }),
-    [resizeX, resizeY]
+    [resizeX]
   );
 
   const handlePointerDown = useCallback(
@@ -127,29 +106,20 @@ export default function ResizableBox({ defaultWidth = 300, defaultHeight = 300, 
   const containerStyle = useMemo(
     () => ({
       width,
-      height,
-      willChange: 'width, height',
+      willChange: 'width',
     }),
-    [width, height]
+    [width]
   );
 
   return (
     <div
       style={containerStyle}
-      className={`grid my-[50px] mx-auto grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] place-items-center bg-black`}
+      className={`flex-1 min-h-[400px] grid my-[50px] mx-auto grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] place-items-center bg-black`}
     >
       <div className="col-[2] row-[2] self-stretch justify-self-stretch">{children}</div>
       <Resizer
-        onPointerDown={(e) => handlePointerDown(e, 'n')}
-        className="col-[2] row-[1] transform-[translateY(-50%)] cursor-row-resize"
-      />
-      <Resizer
         onPointerDown={(e) => handlePointerDown(e, 'e')}
         className="col-[3] row-[2] transform-[translateX(50%)] cursor-col-resize"
-      />
-      <Resizer
-        onPointerDown={(e) => handlePointerDown(e, 's')}
-        className="col-[2] row-[3] transform-[translateY(50%)] cursor-row-resize"
       />
       <Resizer
         onPointerDown={(e) => handlePointerDown(e, 'w')}
