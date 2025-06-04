@@ -5,9 +5,9 @@ interface Props {
   children: React.ReactNode;
 }
 
-export default function ResizableBox({ defaultWidth = 400, children }: Props) {
-  const MIN_WIDTH = 100;
+const MIN_WIDTH = 200;
 
+export default function ResizableBox({ defaultWidth = 400, children }: Props) {
   const [width, setWidth] = useState<number>(defaultWidth);
 
   const resizingState = useRef<'none' | 's' | 'n' | 'w' | 'e'>('none');
@@ -24,7 +24,7 @@ export default function ResizableBox({ defaultWidth = 400, children }: Props) {
     frameId.current = requestAnimationFrame(() => {
       setWidth((prevWidth) => {
         const newWidth = prevWidth + movement * 2;
-        return newWidth >= MIN_WIDTH ? newWidth : prevWidth;
+        return newWidth >= MIN_WIDTH ? newWidth : MIN_WIDTH;
       });
       frameId.current = null;
     });
