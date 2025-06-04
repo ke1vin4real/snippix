@@ -1,4 +1,5 @@
 import { type WindowType } from '@/App';
+import IconUbuntuMin from '@/assets/icons/ubuntu-min.svg?react';
 import IconWinClose from '@/assets/icons/windows-close.svg?react';
 import IconWinMax from '@/assets/icons/windows-max.svg?react';
 import IconWinMin from '@/assets/icons/windows-min.svg?react';
@@ -14,15 +15,11 @@ export default function WindowBox({ type, children }: Props) {
       <div
         className={`select-none h-full w-full rounded-md bg-[#fff] dark:bg-[#252526] shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]`}
       >
-        <div className="flex h-[30px]">
-          <div className="ml-auto">
+        <div className="flex h-[40px] items-center">
+          <div className="flex flex-row gap-[30px] mr-[20px] ml-auto">
             <IconWinMin className="inline fill-[#605e5c] dark:fill-[#f3f2f1]" width="15px" height="15px" />
-            <IconWinMax className="inline ml-[20px] fill-[#605e5c] dark:fill-[#f3f2f1]" width="15px" height="15px" />
-            <IconWinClose
-              className="inline ml-[20px] mr-[10px] fill-[#605e5c] dark:fill-[#f3f2f1]"
-              width="15px"
-              height="15px"
-            />
+            <IconWinMax className="inline fill-[#605e5c] dark:fill-[#f3f2f1]" width="15px" height="15px" />
+            <IconWinClose className="inline fill-[#605e5c] dark:fill-[#f3f2f1]" width="15px" height="15px" />
           </div>
         </div>
         {children}
@@ -44,7 +41,24 @@ export default function WindowBox({ type, children }: Props) {
       </div>
     );
   } else if (type === 'UBUNTU') {
-    return <div className="select-none h-full w-full">{children}</div>;
+    return (
+      <div className="select-none h-full w-full rounded-xl bg-[rgb(230,230,230)] dark:bg-[rgb(25,25,25)]">
+        <div className="flex h-[40px] items-center">
+          <div className="flex flex-row gap-[13px] ml-auto mr-[13px]">
+            <div className="flex items-center justify-center h-[20px] w-[20px] rounded-[50%] bg-[rgb(214,213,208)] dark:bg-[rgb(42,42,42)]">
+              <IconUbuntuMin className="fill-[rgb(44,44,47)] dark:fill-[rgb(211,211,211)]" width="12px" height="12px" />
+            </div>
+            <div className="flex items-center justify-center h-[20px] w-[20px] rounded-[50%] bg-[rgb(214,213,208)] dark:bg-[rgb(42,42,42)]">
+              <IconWinMax className="fill-[rgb(44,44,47)] dark:fill-[rgb(211,211,211)]" width="12px" height="12px" />
+            </div>
+            <div className="flex items-center justify-center h-[20px] w-[20px] rounded-[50%] bg-[rgb(214,213,208)] dark:bg-[rgb(42,42,42)]">
+              <IconWinClose className="fill-[rgb(44,44,47)] dark:fill-[rgb(211,211,211)]" width="12px" height="12px" />
+            </div>
+          </div>
+        </div>
+        {children}
+      </div>
+    );
   } else {
     return <>{children}</>;
   }
