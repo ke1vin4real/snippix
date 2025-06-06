@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.8",
+    "modern-screenshot": "^4.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "shiki": "^3.0.0",

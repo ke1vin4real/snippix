@@ -3,11 +3,12 @@ import { ButtonHTMLAttributes, useCallback, useEffect, useMemo, useRef, useState
 interface Props {
   defaultWidth?: number;
   children: React.ReactNode;
+  ref: React.Ref<HTMLDivElement>;
 }
 
 const MIN_WIDTH = 200;
 
-export default function ResizableBox({ defaultWidth = 400, children }: Props) {
+export default function ResizableBox({ defaultWidth = 400, children, ref }: Props) {
   const [width, setWidth] = useState<number>(defaultWidth);
 
   const resizingState = useRef<'none' | 's' | 'n' | 'w' | 'e'>('none');
@@ -113,6 +114,7 @@ export default function ResizableBox({ defaultWidth = 400, children }: Props) {
 
   return (
     <div
+      ref={ref}
       style={containerStyle}
       className={`flex-1 min-h-[400px] grid my-[50px] mx-auto grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] place-items-center bg-black`}
     >
