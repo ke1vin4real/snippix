@@ -4,11 +4,12 @@ interface Props {
   defaultWidth?: number;
   children: React.ReactNode;
   ref: React.Ref<HTMLDivElement>;
+  showResizer: boolean;
 }
 
 const MIN_WIDTH = 200;
 
-export default function ResizableBox({ defaultWidth = 400, children, ref }: Props) {
+export default function ResizableBox({ defaultWidth = 400, children, ref, showResizer }: Props) {
   const [width, setWidth] = useState<number>(defaultWidth);
 
   const resizingState = useRef<'none' | 's' | 'n' | 'w' | 'e'>('none');
@@ -119,14 +120,18 @@ export default function ResizableBox({ defaultWidth = 400, children, ref }: Prop
       className={`flex-1 min-h-[400px] grid my-[50px] mx-auto grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] place-items-center bg-black`}
     >
       <div className="col-[2] row-[2] self-stretch justify-self-stretch">{children}</div>
-      <Resizer
-        onPointerDown={(e) => handlePointerDown(e, 'e')}
-        className="col-[3] row-[2] transform-[translateX(50%)] cursor-col-resize"
-      />
-      <Resizer
-        onPointerDown={(e) => handlePointerDown(e, 'w')}
-        className="col-[1] row-[2] transform-[translateX(-50%)] cursor-col-resize"
-      />
+      {showResizer && (
+        <>
+          <Resizer
+            onPointerDown={(e) => handlePointerDown(e, 'e')}
+            className="col-[3] row-[2] transform-[translateX(50%)] cursor-col-resize"
+          />
+          <Resizer
+            onPointerDown={(e) => handlePointerDown(e, 'w')}
+            className="col-[1] row-[2] transform-[translateX(-50%)] cursor-col-resize"
+          />
+        </>
+      )}
     </div>
   );
 }

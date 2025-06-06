@@ -17,6 +17,7 @@ function App() {
   const [language, setLauguage] = useState<string>('javascript');
   const [theme, setTheme] = useState<string>('github-dark');
   const [isWindowDark, setIsWindowDark] = useState<boolean>(false);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
   const [windowType, setWindowType] = useState<WindowType>('WINDOWS');
   const resizableBoxRef = useRef<HTMLDivElement>(null);
 
@@ -38,12 +39,19 @@ function App() {
 
   const onClickCreateIMG = useCallback(() => {
     if (!resizableBoxRef.current) return;
-    domToPng(resizableBoxRef.current).then((dataUrl) => {
-      const link = document.createElement('a');
-      link.download = 'screenshot.png';
-      link.href = dataUrl;
-      link.click();
-    });
+    setIsExporting(true);
+    domToPng(resizableBoxRef.current, { scale: window.devicePixelRatio || 1 }).then(
+      (dataUrl) => {
+        setIsExporting(false);
+        const link = document.createElement('a');
+        link.download = 'screenshot.png';
+        link.href = dataUrl;
+        link.click();
+      },
+      () => {
+        setIsExporting(false);
+      }
+    );
   }, []);
 
   // FIXME: the logo svg needs to be replaced with a better one
@@ -61,7 +69,7 @@ function App() {
       </header>
       <main className="flex flex-1">
         <div className={`flex-1 ${isWindowDark ? 'dark' : ''}`}>
-          <ResizableBox ref={resizableBoxRef}>
+          <ResizableBox ref={resizableBoxRef} showResizer={!isExporting}>
             <WindowBox type={windowType}>
               <Editor language={language} theme={theme} />
             </WindowBox>
