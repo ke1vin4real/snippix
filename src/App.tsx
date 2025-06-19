@@ -10,6 +10,8 @@ import { langugageList } from '@/configs/langugage-list';
 import { themeList } from '@/configs/theme-list';
 import { domToPng } from 'modern-screenshot';
 import { useCallback, useRef, useState } from 'react';
+import { useDeviceDetect } from './hooks/useDeviceDetect';
+import { useKeyboardShortcut } from './hooks/useKeyboardShortcuts';
 
 export type WindowType = 'WINDOWS' | 'MAC' | 'UBUNTU' | 'NONE';
 
@@ -20,6 +22,10 @@ function App() {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [windowType, setWindowType] = useState<WindowType>('WINDOWS');
   const resizableBoxRef = useRef<HTMLDivElement>(null);
+  // TODO: render another page if opened in mobile
+  const { os } = useDeviceDetect();
+  const isMac = os === 'mac';
+  const ctrlKey = isMac ? 'meta' : 'ctrl';
 
   const handleLanguageChange = useCallback((language: string) => {
     setLauguage(language);
@@ -53,6 +59,8 @@ function App() {
       }
     );
   }, []);
+
+  useKeyboardShortcut(ctrlKey);
 
   // FIXME: the logo svg needs to be replaced with a better one
   return (

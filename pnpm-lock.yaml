@@ -11,6 +11,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.0.8
         version: 4.0.8(vite@6.1.0(@types/node@20.17.19)(jiti@2.4.2)(lightningcss@1.29.1))
+      hotkeys-js:
+        specifier: ^3.13.14
+        version: 3.13.14
       modern-screenshot:
         specifier: ^4.6.0
         version: 4.6.0
@@ -1058,6 +1061,9 @@ packages:
 
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
+
+  hotkeys-js@3.13.14:
+    resolution: {integrity: sha512-jmWwEP3twlpPV2/WpzuQzJTg/0MRjWlvKJScEREueIuzoMJ6gmqNrv6sm1WIpW+3g0TzDmQpj2pX8HvYPx90hw==}
 
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
@@ -2516,6 +2522,8 @@ snapshots:
   hast-util-whitespace@3.0.0:
     dependencies:
       '@types/hast': 3.0.4
+
+  hotkeys-js@3.13.14: {}
 
   html-void-elements@3.0.0: {}
 

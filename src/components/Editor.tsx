@@ -20,24 +20,6 @@ export default function Editor({ language, theme }: Props) {
     setCode(textareaRef.current?.value ?? '');
   }, []);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-    //   if (e.shiftKey) {
-    //     // Ctrl + Shift + Z：执行重做操作
-    //     e.preventDefault();
-    //     handleRedo();
-    //   } else {
-    //     // Ctrl + Z：执行撤销操作
-    //     e.preventDefault();
-    //     handleUndo();
-    //   }
-    // }
-
-    if (highlighterRef.current) {
-      highlighterRef.current.getLoadedLanguages();
-    }
-  }, []);
-
   useEffect(() => {
     (async () => {
       try {
@@ -150,7 +132,6 @@ export default function Editor({ language, theme }: Props) {
         autoComplete="false"
         placeholder=""
         onChange={handleChange}
-        onKeyDown={handleKeyDown}
       />
     </div>
   );
