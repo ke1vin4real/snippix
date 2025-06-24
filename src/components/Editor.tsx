@@ -14,10 +14,11 @@ export default function Editor({ language, theme }: Props) {
   const [code, setCode] = useState('');
   const [highlightedCode, setHighlightedCode] = useState('');
   const highlighterRef = useRef<HighlighterCore>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const loadedLangsRef = useRef<Set<string>>(new Set());
+  const loadedThemesRef = useRef<Set<string>>(new Set());
 
-  const handleChange = useCallback(() => {
-    setCode(textareaRef.current?.value ?? '');
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCode(e.target.value);
   }, []);
 
   useEffect(() => {
@@ -30,6 +31,9 @@ export default function Editor({ language, theme }: Props) {
           ],
           engine: createOnigurumaEngine(import('shiki/wasm')),
         });
+
+        loadedLangsRef.current.add(language);
+        loadedThemesRef.current.add(theme);
       } catch (error) {
         throw new Error('Failed to create highlighter:' + error);
       }
@@ -46,78 +50,34 @@ export default function Editor({ language, theme }: Props) {
   useEffect(() => {
     if (!highlighterRef.current) return;
 
-    setHighlightedCode(
-      highlighterRef.current?.codeToHtml(code, {
-        lang: language,
-        theme,
-      })
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code]);
-
-  useEffect(() => {
-    if (!highlighterRef.current) return;
-
-    const loadedLangs = highlighterRef.current.getLoadedLanguages();
-
     (async () => {
-      if (!loadedLangs.includes(language)) {
-        try {
-          await highlighterRef.current?.loadLanguage(
-            langModules[`../../node_modules/shiki/dist/langs/${language}.mjs`]() as Promise<LanguageRegistration>
-          );
-          setHighlightedCode(
-            highlighterRef.current?.codeToHtml(code, {
-              lang: language,
-              theme,
-            }) as string
-          );
-        } catch (e) {
-          throw e as string;
-        }
-      } else {
-        setHighlightedCode(
-          highlighterRef.current?.codeToHtml(code, {
-            lang: language,
-            theme,
-          }) as string
+      // check and load language
+      if (!loadedLangsRef.current.has(language)) {
+        await highlighterRef.current!.loadLanguage(
+          (langModules[`../../node_modules/shiki/dist/langs/${language}.mjs`] as () => Promise<LanguageRegistration>)()
         );
+
+        loadedLangsRef.current.add(language);
       }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language]);
 
-  useEffect(() => {
-    if (!highlighterRef.current) return;
-
-    const loadedThemes = highlighterRef.current.getLoadedThemes();
-
-    (async () => {
-      if (!loadedThemes.includes(theme)) {
-        try {
-          await highlighterRef.current?.loadTheme(
-            themeModules[`../../node_modules/shiki/dist/themes/${theme}.mjs`]() as Promise<ThemeRegistration>
-          );
-          setHighlightedCode(
-            highlighterRef.current?.codeToHtml(code, {
-              lang: language,
-              theme,
-            }) as string
-          );
-        } catch (e) {
-          throw e as string;
-        }
-      } else {
-        setHighlightedCode(
-          highlighterRef.current?.codeToHtml(code, {
-            lang: language,
-            theme,
-          }) as string
+      // check and load theme
+      if (!loadedThemesRef.current.has(theme)) {
+        await highlighterRef.current!.loadTheme(
+          (themeModules[`../../node_modules/shiki/dist/themes/${theme}.mjs`] as () => Promise<ThemeRegistration>)()
         );
+
+        loadedThemesRef.current.add(theme);
       }
+
+      // generate highlighted code
+      setHighlightedCode(
+        highlighterRef.current!.codeToHtml(code, {
+          lang: language,
+          theme,
+        })
+      );
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme]);
+  }, [code, language, theme]);
 
   return (
     <div className="grid h-full w-full">
@@ -126,7 +86,7 @@ export default function Editor({ language, theme }: Props) {
         dangerouslySetInnerHTML={{ __html: highlightedCode }}
       />
       <textarea
-        ref={textareaRef}
+        value={code}
         className="col-start-1 row-start-1 w-full resize-none rounded-lg bg-transparent p-4 font-mono text-sm text-transparent caret-white outline-none"
         spellCheck={false}
         autoComplete="false"
