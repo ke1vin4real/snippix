@@ -1,25 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type HighlighterCore, LanguageRegistration, ThemeRegistration, createHighlighterCore } from 'shiki/core';
 import { createOnigurumaEngine } from 'shiki/engine/oniguruma';
 
 interface Props {
+  code: string;
   language: string;
   theme: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 const langModules = import.meta.glob('../../node_modules/shiki/dist/langs/*.mjs');
 const themeModules = import.meta.glob('../../node_modules/shiki/dist/themes/*.mjs');
 
-export default function Editor({ language, theme }: Props) {
-  const [code, setCode] = useState('');
+export default function Editor({ code, language, theme, onChange }: Props) {
   const [highlightedCode, setHighlightedCode] = useState('');
   const highlighterRef = useRef<HighlighterCore>(null);
   const loadedLangsRef = useRef<Set<string>>(new Set());
   const loadedThemesRef = useRef<Set<string>>(new Set());
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCode(e.target.value);
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -42,6 +39,7 @@ export default function Editor({ language, theme }: Props) {
     return () => {
       if (highlighterRef.current) {
         highlighterRef.current.dispose();
+        highlighterRef.current = null;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,8 +88,10 @@ export default function Editor({ language, theme }: Props) {
         className="col-start-1 row-start-1 w-full resize-none rounded-lg bg-transparent p-4 font-mono text-sm text-transparent caret-white outline-none"
         spellCheck={false}
         autoComplete="false"
+        autoCapitalize="off"
+        autoCorrect="off"
         placeholder=""
-        onChange={handleChange}
+        onChange={onChange}
       />
     </div>
   );

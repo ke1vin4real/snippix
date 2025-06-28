@@ -1,26 +1,19 @@
 import hotkeys from 'hotkeys-js';
 import { useEffect } from 'react';
 
-export function useKeyboardShortcut(ctrlKey: string) {
+export function useKeyboardShortcut(shortcuts: Array<{ keys: string; handler: (e: KeyboardEvent) => void }>) {
   useEffect(() => {
     hotkeys.filter = () => true;
 
-    hotkeys(`${ctrlKey}+z`, (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
-        console.log('stopped undo');
-        e.preventDefault();
-      }
-    });
-
-    hotkeys(`${ctrlKey}+shift+z`, (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
-        console.log('stopped redo');
-        e.preventDefault();
-      }
-    });
+    for (const shortcut of shortcuts) {
+      hotkeys(shortcut.keys, (e) => {
+        shortcut.handler(e);
+      });
+    }
 
     return () => {
       hotkeys.unbind();
     };
-  }, [ctrlKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }

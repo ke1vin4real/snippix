@@ -16,6 +16,7 @@ import { useKeyboardShortcut } from './hooks/useKeyboardShortcuts';
 export type WindowType = 'WINDOWS' | 'MAC' | 'UBUNTU' | 'NONE';
 
 function App() {
+  const [code, setCode] = useState('');
   const [language, setLauguage] = useState<string>('javascript');
   const [theme, setTheme] = useState<string>('github-dark');
   const [isWindowDark, setIsWindowDark] = useState<boolean>(false);
@@ -26,6 +27,12 @@ function App() {
   const { os } = useDeviceDetect();
   const isMac = os === 'mac';
   const ctrlKey = isMac ? 'meta' : 'ctrl';
+
+  const handleCodeChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const nativeEvent = e.nativeEvent as InputEvent;
+    console.log(nativeEvent.inputType, nativeEvent.data);
+    setCode(e.target.value);
+  }, []);
 
   const handleLanguageChange = useCallback((language: string) => {
     setLauguage(language);
@@ -60,7 +67,26 @@ function App() {
     );
   }, []);
 
-  useKeyboardShortcut(ctrlKey);
+  useKeyboardShortcut([
+    {
+      keys: `${ctrlKey}+z`,
+      handler: (e: KeyboardEvent) => {
+        if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
+          console.log('stopped undo');
+          e.preventDefault();
+        }
+      },
+    },
+    {
+      keys: `${ctrlKey}+shift+z`,
+      handler: (e: KeyboardEvent) => {
+        if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
+          console.log('stopped redo');
+          e.preventDefault();
+        }
+      },
+    },
+  ]);
 
   // FIXME: the logo svg needs to be replaced with a better one
   return (
@@ -79,7 +105,7 @@ function App() {
         <div className={`flex-1 ${isWindowDark ? 'dark' : ''}`}>
           <ResizableBox ref={resizableBoxRef} showResizer={!isExporting}>
             <WindowBox type={windowType}>
-              <Editor language={language} theme={theme} />
+              <Editor code={code} language={language} theme={theme} onChange={handleCodeChange} />
             </WindowBox>
           </ResizableBox>
         </div>
