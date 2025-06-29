@@ -10,18 +10,18 @@ export function useUndoRedo<T = unknown>() {
     if (!canUndo) return;
 
     const operation = historyStackRef.current[currentIndexRef.current--];
-    applyReverse(operation);
     setCanRedo(true);
     setCanUndo(currentIndexRef.current >= 0);
+    return operation;
   };
 
   const redo = () => {
     if (!canRedo) return;
 
     const operation = historyStackRef.current[++currentIndexRef.current];
-    apply(operation);
     setCanUndo(true);
     setCanRedo(currentIndexRef.current + 1 < historyStackRef.current.length);
+    return operation;
   };
 
   const addOperation = (operation: T) => {
@@ -30,14 +30,6 @@ export function useUndoRedo<T = unknown>() {
     currentIndexRef.current = historyStackRef.current.length - 1;
     setCanUndo(true);
     setCanRedo(false);
-  };
-
-  const apply = (operation: T) => {
-    console.log('Applying operation:', operation);
-  };
-
-  const applyReverse = (operation: T) => {
-    console.log('Reversing operation:', operation);
   };
 
   const clear = () => {
