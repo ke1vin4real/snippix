@@ -6,17 +6,31 @@ interface Props {
   code: string;
   language: string;
   theme: string;
+  selection: { start: number; end: number };
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onCompositionStart: (e: CompositionEvent) => void;
+  onCompositionEnd: (e: CompositionEvent) => void;
+  onSelectionChange: (e: Event) => void;
 }
 
 const langModules = import.meta.glob('../../node_modules/shiki/dist/langs/*.mjs');
 const themeModules = import.meta.glob('../../node_modules/shiki/dist/themes/*.mjs');
 
-export default function Editor({ code, language, theme, onChange }: Props) {
+export default function Editor({
+  selection,
+  code,
+  language,
+  theme,
+  onChange,
+  onCompositionStart,
+  onCompositionEnd,
+  onSelectionChange,
+}: Props) {
   const [highlightedCode, setHighlightedCode] = useState('');
   const highlighterRef = useRef<HighlighterCore>(null);
   const loadedLangsRef = useRef<Set<string>>(new Set());
   const loadedThemesRef = useRef<Set<string>>(new Set());
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     (async () => {
@@ -77,6 +91,65 @@ export default function Editor({ code, language, theme, onChange }: Props) {
     })();
   }, [code, language, theme]);
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.selectionStart = selection.start;
+      textareaRef.current.selectionEnd = selection.end;
+    }
+  }, [selection]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+
+    if (textarea) {
+      textarea.addEventListener('compositionstart', onCompositionStart);
+      textarea.addEventListener('compositionend', onCompositionEnd);
+    }
+
+    return () => {
+      if (textarea) {
+        textarea.removeEventListener('compositionstart', onCompositionStart);
+        textarea.removeEventListener('compositionend', onCompositionEnd);
+      }
+    };
+  }, [onCompositionStart, onCompositionEnd]);
+
+  useEffect(() => {
+    const events = ['select', 'keyup', 'mouseup', 'click', 'focus'];
+    const textarea = textareaRef.current;
+
+    if (textarea) {
+      events.forEach((eventName) => {
+        textarea.addEventListener(eventName, onSelectionChange);
+      });
+    }
+
+    return () => {
+      if (textarea) {
+        events.forEach((eventName) => {
+          textarea.removeEventListener(eventName, onSelectionChange);
+        });
+      }
+    };
+  }, [onSelectionChange]);
+
+  // useEffect(() => {
+  //   const drag = (e: InputEvent) => {
+  //     console.log(e, e.inputType, e.data);
+  //   };
+
+  //   const textarea = textareaRef.current;
+  //   if (textarea) {
+  //     textarea.addEventListener('input', drag);
+  //   }
+
+  //   return () => {
+  //     if (textarea) {
+  //       textarea.removeEventListener('input', drag);
+  //     }
+  //   };
+  // }, []);
+
   return (
     <div className="grid h-full w-full">
       <div
@@ -84,6 +157,7 @@ export default function Editor({ code, language, theme, onChange }: Props) {
         dangerouslySetInnerHTML={{ __html: highlightedCode }}
       />
       <textarea
+        ref={textareaRef}
         value={code}
         className="col-start-1 row-start-1 w-full resize-none rounded-lg bg-transparent p-4 font-mono text-sm text-transparent caret-white outline-none"
         spellCheck={false}
@@ -91,7 +165,8 @@ export default function Editor({ code, language, theme, onChange }: Props) {
         autoCapitalize="off"
         autoCorrect="off"
         placeholder=""
-        onChange={onChange}
+        // onChange={onChange}
+        onInput={onChange}
       />
     </div>
   );
