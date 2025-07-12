@@ -7,7 +7,7 @@ interface Props {
   language: string;
   theme: string;
   selection: { start: number; end: number };
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void;
   onCompositionStart: (e: CompositionEvent) => void;
   onCompositionEnd: (e: CompositionEvent) => void;
   onSelectionChange: (e: Event) => void;
@@ -165,7 +165,6 @@ export default function Editor({
         autoCapitalize="off"
         autoCorrect="off"
         placeholder=""
-        // onChange={onChange}
         onInput={onChange}
       />
     </div>

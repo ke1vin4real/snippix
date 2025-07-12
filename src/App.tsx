@@ -41,11 +41,7 @@ function App() {
 
   // Due to safari wouldn't get the latest selection after 'insertFromDrop', use async function and Promise to analyze the InputEvent
   const analyzeInput = useCallback(
-    async (
-      e: React.ChangeEvent<HTMLTextAreaElement>,
-      oldValue: string,
-      newValue: string
-    ): Promise<Operation | null> => {
+    async (e: React.FormEvent<HTMLTextAreaElement>, oldValue: string, newValue: string): Promise<Operation | null> => {
       const nativeEvent = e.nativeEvent as InputEvent;
       const { inputType: type } = nativeEvent;
       const data = nativeEvent.data || '';
@@ -94,7 +90,7 @@ function App() {
           };
         }
       } else if (type === 'insertFromDrop') {
-        // 等待一帧，让浏览器更新 selection
+        // wait until next frame to get the latest selection
         await new Promise<void>((resolve) => {
           setTimeout(() => {
             const textarea = nativeEvent.target as HTMLTextAreaElement;
@@ -103,7 +99,6 @@ function App() {
           }, 0);
         });
 
-        // 现在 newSelection 是最新的，可以正确生成 operation
         operation = {
           type: 'text_insert',
           selectionBefore: { start: newSelection.end - data.length, end: newSelection.end - data.length },
@@ -131,13 +126,13 @@ function App() {
   );
 
   const handleCodeChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      analyzeInput(e, code, e.target.value).then((operation) => {
+    (e: React.FormEvent<HTMLTextAreaElement>) => {
+      analyzeInput(e, code, e.currentTarget.value).then((operation) => {
         if (operation) {
           addOperation(operation);
         }
       });
-      setCode(e.target.value);
+      setCode(e.currentTarget.value);
     },
     [addOperation, analyzeInput, code]
   );
