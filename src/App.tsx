@@ -60,7 +60,7 @@ function App() {
           operation = {
             type: 'text_insert',
             selectionBefore: lastSelection,
-            insertedText: data,
+            insertedText: type === 'insertLineBreak' ? '\n' : data,
             selectionAfter: newSelection,
           };
         } else {
