@@ -16,7 +16,7 @@ import { useUndoRedo } from './hooks/useUndoRedo';
 
 export type WindowType = 'WINDOWS' | 'MAC' | 'UBUNTU' | 'NONE';
 type Operation = {
-  type: 'text_insert' | 'text_replace' | 'text_delete';
+  type: 'text_insert' | 'text_replace' | 'text_delete' | 'text_delete_forward';
   selectionBefore: { start: number; end: number };
   selectionAfter: { start: number; end: number };
   insertedText?: string;
@@ -50,9 +50,15 @@ function App() {
       const lastSelection = lastTextSelectionRef.current;
       let newSelection = { start: textarea.selectionStart, end: textarea.selectionEnd };
       let operation: Operation | null = null;
+      const isSelectRange = lastSelection.start !== lastSelection.end;
 
-      if (type === 'insertText' || type === 'insertLineBreak' || type === 'insertFromPaste') {
-        if (lastSelection.start === lastSelection.end) {
+      if (
+        type === 'insertText' ||
+        type === 'insertLineBreak' ||
+        type === 'insertFromPaste' ||
+        type === 'insertFromYank'
+      ) {
+        if (!isSelectRange) {
           operation = {
             type: 'text_insert',
             selectionBefore: lastSelection,
@@ -74,7 +80,7 @@ function App() {
         type === 'deleteSoftLineBackward' ||
         type === 'deleteHardLineBackward'
       ) {
-        if (lastSelection.start === lastSelection.end) {
+        if (!isSelectRange) {
           operation = {
             type: 'text_delete',
             selectionBefore: lastSelection,
@@ -111,6 +117,21 @@ function App() {
           type: 'text_delete',
           selectionBefore: lastSelection,
           deletedText: oldValue.substring(lastSelection.start, lastSelection.end),
+          selectionAfter: newSelection,
+        };
+      } else if (
+        type === 'deleteWordForward' ||
+        type === 'deleteSoftLineForward' ||
+        type === 'deleteHardLineForward' ||
+        type === 'deleteContent' ||
+        type === 'deleteContentForward'
+      ) {
+        operation = {
+          type: isSelectRange ? 'text_delete' : 'text_delete_forward',
+          selectionBefore: lastSelection,
+          deletedText: isSelectRange
+            ? oldValue.substring(lastSelection.start, lastSelection.end)
+            : oldValue.substring(lastSelection.start, lastSelection.start + (oldValue.length - newValue.length)),
           selectionAfter: newSelection,
         };
       }
@@ -219,6 +240,13 @@ function App() {
             operation.deletedText +
             prevCode.substring(selectionAfter.start)
         );
+      } else if (type === 'text_delete_forward') {
+        setCode(
+          (prevCode) =>
+            prevCode.substring(0, selectionAfter.start) +
+            operation.deletedText +
+            prevCode.substring(selectionAfter.start)
+        );
       }
 
       setSelection(selectionBefore);
@@ -246,6 +274,12 @@ function App() {
         );
       } else if (type === 'text_delete') {
         setCode((prevCode) => prevCode.substring(0, selectionAfter.start) + prevCode.substring(selectionBefore.end));
+      } else if (type === 'text_delete_forward') {
+        setCode(
+          (prevCode) =>
+            prevCode.substring(0, selectionAfter.start) +
+            prevCode.substring(selectionAfter.start + operation.deletedText!.length)
+        );
       }
 
       setSelection(selectionAfter);
@@ -269,6 +303,15 @@ function App() {
         if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
           e.preventDefault();
           doRedo();
+        }
+      },
+    },
+    {
+      // Prevent inputs like 'insertTranspose', in safari action of 'insertTranspose' trigger with type 'insertText'
+      keys: `ctrl+t`,
+      handler: (e: KeyboardEvent) => {
+        if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
+          e.preventDefault();
         }
       },
     },

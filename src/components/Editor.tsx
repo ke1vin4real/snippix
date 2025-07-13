@@ -133,23 +133,6 @@ export default function Editor({
     };
   }, [onSelectionChange]);
 
-  // useEffect(() => {
-  //   const drag = (e: InputEvent) => {
-  //     console.log(e, e.inputType, e.data);
-  //   };
-
-  //   const textarea = textareaRef.current;
-  //   if (textarea) {
-  //     textarea.addEventListener('input', drag);
-  //   }
-
-  //   return () => {
-  //     if (textarea) {
-  //       textarea.removeEventListener('input', drag);
-  //     }
-  //   };
-  // }, []);
-
   return (
     <div className="grid h-full w-full">
       <div
