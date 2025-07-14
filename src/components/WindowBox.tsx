@@ -1,4 +1,3 @@
-import { type WindowType } from '@/App';
 import IconUbuntuMin from '@/assets/icons/ubuntu-min.svg?react';
 import IconWinClose from '@/assets/icons/windows-close.svg?react';
 import IconWinMax from '@/assets/icons/windows-max.svg?react';

@@ -6,7 +6,7 @@ interface Props {
   code: string;
   language: string;
   theme: string;
-  selection: { start: number; end: number };
+  selection: EditorSelection;
   onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void;
   onCompositionStart: (e: CompositionEvent) => void;
   onCompositionEnd: (e: CompositionEvent) => void;

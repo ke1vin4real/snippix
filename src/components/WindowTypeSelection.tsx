@@ -1,4 +1,3 @@
-import { type WindowType } from '@/App';
 import { useCallback } from 'react';
 
 interface Props {
