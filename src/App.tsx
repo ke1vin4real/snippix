@@ -12,8 +12,9 @@ import { domToPng } from 'modern-screenshot';
 import { useCallback, useRef, useState } from 'react';
 import useCodeInput from './hooks/useCodeInput';
 import { useDeviceDetect } from './hooks/useDeviceDetect';
+import { useHistory } from './hooks/useHistory';
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcuts';
-import { useUndoRedo } from './hooks/useUndoRedo';
+import useUndoRedoAction from './hooks/useUndoRedoAction';
 
 function App() {
   const [code, setCode] = useState('');
@@ -30,18 +31,19 @@ function App() {
   const ctrlKey = isMac ? 'meta' : 'ctrl';
   const lastTextSelectionRef = useRef<EditorSelection>({ start: 0, end: 0 });
   const { analyzeInput } = useCodeInput(lastTextSelectionRef);
-  const { undo, redo, addOperation } = useUndoRedo<Operation>();
+  const { undo, redo, addHistory } = useHistory<Operation>();
+  const { undoAction, redoAction } = useUndoRedoAction(setCode, setSelection, lastTextSelectionRef);
 
   const handleCodeChange = useCallback(
     (e: React.FormEvent<HTMLTextAreaElement>) => {
       analyzeInput(e, code, e.currentTarget.value).then((operation) => {
         if (operation) {
-          addOperation(operation);
+          addHistory(operation);
         }
       });
       setCode(e.currentTarget.value);
     },
-    [addOperation, analyzeInput, code]
+    [addHistory, analyzeInput, code]
   );
 
   const handleLanguageChange = useCallback((language: string) => {
@@ -68,14 +70,15 @@ function App() {
   const handleCompositonEnd = useCallback(
     (e: CompositionEvent) => {
       const textarea = e.target as HTMLTextAreaElement;
-      addOperation({
-        type: 'text_insert',
+      addHistory({
+        type: 'text',
+        action: 'text_insert',
         insertedText: e.data,
         selectionBefore: lastTextSelectionRef.current,
         selectionAfter: { start: textarea.selectionStart, end: textarea.selectionEnd },
       });
     },
-    [addOperation]
+    [addHistory]
   );
 
   const handleSelectionChange = useCallback((e: Event) => {
@@ -102,74 +105,15 @@ function App() {
     );
   }, []);
 
-  const doUndo = () => {
+  const performUndo = () => {
     undo((operation) => {
-      const { type, selectionBefore, selectionAfter } = operation;
-
-      if (type === 'text_insert') {
-        setCode(
-          (prevCode) =>
-            prevCode.substring(0, selectionBefore.start) +
-            prevCode.substring(selectionBefore.start + operation.insertedText!.length)
-        );
-      } else if (type === 'text_replace') {
-        setCode(
-          (prevCode) =>
-            prevCode.substring(0, selectionBefore.start) +
-            operation.deletedText +
-            prevCode.substring(selectionBefore.start + operation.insertedText!.length)
-        );
-      } else if (type === 'text_delete') {
-        setCode(
-          (prevCode) =>
-            prevCode.substring(0, selectionAfter.start) +
-            operation.deletedText +
-            prevCode.substring(selectionAfter.start)
-        );
-      } else if (type === 'text_delete_forward') {
-        setCode(
-          (prevCode) =>
-            prevCode.substring(0, selectionAfter.start) +
-            operation.deletedText +
-            prevCode.substring(selectionAfter.start)
-        );
-      }
-
-      setSelection(selectionBefore);
-      lastTextSelectionRef.current = selectionBefore;
+      undoAction(operation);
     });
   };
 
-  const doRedo = () => {
+  const performRedo = () => {
     redo((operation) => {
-      const { type, selectionBefore, selectionAfter } = operation;
-
-      if (type === 'text_insert') {
-        setCode(
-          (prevCode) =>
-            prevCode.substring(0, selectionBefore.start) +
-            operation.insertedText +
-            prevCode.substring(selectionBefore.start)
-        );
-      } else if (type === 'text_replace') {
-        setCode(
-          (prevCode) =>
-            prevCode.substring(0, selectionBefore.start) +
-            operation.insertedText +
-            prevCode.substring(selectionBefore.end)
-        );
-      } else if (type === 'text_delete') {
-        setCode((prevCode) => prevCode.substring(0, selectionAfter.start) + prevCode.substring(selectionBefore.end));
-      } else if (type === 'text_delete_forward') {
-        setCode(
-          (prevCode) =>
-            prevCode.substring(0, selectionAfter.start) +
-            prevCode.substring(selectionAfter.start + operation.deletedText!.length)
-        );
-      }
-
-      setSelection(selectionAfter);
-      lastTextSelectionRef.current = selectionAfter;
+      redoAction(operation);
     });
   };
 
@@ -179,7 +123,7 @@ function App() {
       handler: (e: KeyboardEvent) => {
         if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
           e.preventDefault();
-          doUndo();
+          performUndo();
         }
       },
     },
@@ -188,7 +132,7 @@ function App() {
       handler: (e: KeyboardEvent) => {
         if ((e.target as HTMLElement).tagName === 'TEXTAREA') {
           e.preventDefault();
-          doRedo();
+          performRedo();
         }
       },
     },

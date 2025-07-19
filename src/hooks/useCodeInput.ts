@@ -22,14 +22,16 @@ export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelec
       ) {
         if (!isSelectRange) {
           operation = {
-            type: 'text_insert',
+            type: 'text',
+            action: 'text_insert',
             selectionBefore: lastSelection,
             insertedText: type === 'insertLineBreak' ? '\n' : data,
             selectionAfter: newSelection,
           };
         } else {
           operation = {
-            type: 'text_replace',
+            type: 'text',
+            action: 'text_replace',
             selectionBefore: lastSelection,
             insertedText: data,
             deletedText: oldValue.substring(lastSelection.start, lastSelection.end),
@@ -44,14 +46,16 @@ export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelec
       ) {
         if (!isSelectRange) {
           operation = {
-            type: 'text_delete',
+            type: 'text',
+            action: 'text_delete',
             selectionBefore: lastSelection,
             deletedText: oldValue.substring(newSelection.start, lastSelection.start),
             selectionAfter: newSelection,
           };
         } else {
           operation = {
-            type: 'text_delete',
+            type: 'text',
+            action: 'text_delete',
             selectionBefore: lastSelection,
             deletedText: oldValue.substring(lastSelection.start, lastSelection.end),
             selectionAfter: newSelection,
@@ -68,7 +72,8 @@ export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelec
         });
 
         operation = {
-          type: 'text_insert',
+          type: 'text',
+          action: 'text_insert',
           selectionBefore: { start: newSelection.end - data.length, end: newSelection.end - data.length },
           insertedText: data,
           selectionAfter: newSelection,
@@ -76,7 +81,8 @@ export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelec
       } else if (type === 'deleteByDrag') {
         // console.log(lastSelection.start, lastSelection.end, newSelection.start, newSelection.end);
         operation = {
-          type: 'text_delete',
+          type: 'text',
+          action: 'text_delete',
           selectionBefore: lastSelection,
           deletedText: oldValue.substring(lastSelection.start, lastSelection.end),
           selectionAfter: newSelection,
@@ -89,7 +95,8 @@ export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelec
         type === 'deleteContentForward'
       ) {
         operation = {
-          type: isSelectRange ? 'text_delete' : 'text_delete_forward',
+          type: 'text',
+          action: isSelectRange ? 'text_delete' : 'text_delete_forward',
           selectionBefore: lastSelection,
           deletedText: isSelectRange
             ? oldValue.substring(lastSelection.start, lastSelection.end)

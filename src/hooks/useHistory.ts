@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-export function useUndoRedo<T = unknown>() {
+export function useHistory<T = unknown>() {
   const historyStackRef = useRef<Array<T>>([]);
   const currentIndexRef = useRef<number>(-1);
   const [canUndo, setCanUndo] = useState<boolean>(false);
@@ -47,7 +47,7 @@ export function useUndoRedo<T = unknown>() {
     }
   }, []);
 
-  const addOperation = useCallback((operation: T) => {
+  const addHistory = useCallback((operation: T) => {
     if (isProcessing.current) {
       return;
     }
@@ -80,7 +80,7 @@ export function useUndoRedo<T = unknown>() {
   return {
     undo,
     redo,
-    addOperation,
+    addHistory,
     canUndo,
     canRedo,
     clear,
