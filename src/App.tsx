@@ -14,7 +14,7 @@ import useCodeInput from './hooks/useCodeInput';
 import { useDeviceDetect } from './hooks/useDeviceDetect';
 import { useHistory } from './hooks/useHistory';
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcuts';
-import useUndoRedoAction from './hooks/useUndoRedoAction';
+import useUndoRedoAction, { bracketPairs } from './hooks/useUndoRedoAction';
 
 function App() {
   const [code, setCode] = useState('');
@@ -41,7 +41,28 @@ function App() {
           addHistory(operation);
         }
       });
-      setCode(e.currentTarget.value);
+
+      const { data } = e.nativeEvent as InputEvent;
+      const lastTextSelection = lastTextSelectionRef.current;
+      const textarea = e.target as HTMLTextAreaElement;
+      if (data === '(' || data === '{' || data === '[') {
+        setCode(
+          (prevCode) =>
+            prevCode.substring(0, lastTextSelection.start - 1) +
+            data +
+            prevCode.substring(lastTextSelection.start - 1, lastTextSelection.end - 1) +
+            bracketPairs[data] +
+            prevCode.substring(lastTextSelection.end - 1)
+        );
+
+        setTimeout(() => {
+          console.log(lastTextSelection.start, lastTextSelection.end);
+          textarea.selectionStart = lastTextSelection.start;
+          textarea.selectionEnd = lastTextSelection.end;
+        }, 0);
+      } else {
+        setCode(e.currentTarget.value);
+      }
     },
     [addHistory, analyzeInput, code]
   );

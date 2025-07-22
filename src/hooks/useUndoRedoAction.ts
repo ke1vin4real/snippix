@@ -1,5 +1,11 @@
 import { useCallback, type Dispatch, type RefObject, type SetStateAction } from 'react';
 
+export const bracketPairs: Record<string, string> = {
+  '(': ')',
+  '[': ']',
+  '{': '}',
+};
+
 export default function useUndoRedoAction(
   setCode: Dispatch<SetStateAction<string>>,
   setSelection: Dispatch<SetStateAction<EditorSelection>>,
@@ -33,6 +39,12 @@ export default function useUndoRedoAction(
               prevCode.substring(0, selectionAfter.start) +
               operation.deletedText +
               prevCode.substring(selectionAfter.start)
+            );
+          } else if (action === 'text_complete_bracket') {
+            return (
+              prevCode.substring(0, selectionAfter.start - 1) +
+              prevCode.substring(selectionAfter.start, selectionAfter.end) +
+              prevCode.substring(selectionAfter.end + 1)
             );
           }
 
@@ -70,6 +82,14 @@ export default function useUndoRedoAction(
             return (
               prevCode.substring(0, selectionAfter.start) +
               prevCode.substring(selectionAfter.start + operation.deletedText!.length)
+            );
+          } else if (action === 'text_complete_bracket') {
+            return (
+              prevCode.substring(0, selectionBefore.start) +
+              operation.insertedText +
+              prevCode.substring(selectionBefore.start, selectionBefore.end) +
+              bracketPairs[operation.insertedText as string] +
+              prevCode.substring(selectionBefore.end)
             );
           }
           return prevCode;

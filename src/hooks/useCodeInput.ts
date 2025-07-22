@@ -1,7 +1,7 @@
 import { RefObject, useCallback } from 'react';
 
 export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelection>) {
-  // Due to safari wouldn't get the latest selection after 'insertFromDrop', use async function and Promise to analyze the InputEvent
+  // Due to safari wouldn't get the latest selection after 'insertFromDrop', use async function
   const analyzeInput = useCallback(
     async (e: React.FormEvent<HTMLTextAreaElement>, oldValue: string, newValue: string): Promise<Operation | null> => {
       const nativeEvent = e.nativeEvent as InputEvent;
@@ -14,30 +14,35 @@ export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelec
       let operation: Operation | null = null;
       const isSelectRange = lastSelection.start !== lastSelection.end;
 
-      if (
-        type === 'insertText' ||
-        type === 'insertLineBreak' ||
-        type === 'insertFromPaste' ||
-        type === 'insertFromYank'
-      ) {
-        if (!isSelectRange) {
+      if (type === 'insertText') {
+        if (data === '{' || data === '(' || data === '[') {
+          newSelection = { start: lastSelection.start + 1, end: lastSelection.end + 1 };
           operation = {
             type: 'text',
-            action: 'text_insert',
+            action: 'text_complete_bracket',
+            insertedText: data,
             selectionBefore: lastSelection,
-            insertedText: type === 'insertLineBreak' ? '\n' : data,
             selectionAfter: newSelection,
           };
         } else {
           operation = {
             type: 'text',
-            action: 'text_replace',
-            selectionBefore: lastSelection,
+            action: isSelectRange ? 'text_replace' : 'text_insert',
             insertedText: data,
-            deletedText: oldValue.substring(lastSelection.start, lastSelection.end),
+            selectionBefore: lastSelection,
             selectionAfter: newSelection,
+            deletedText: isSelectRange ? oldValue.substring(lastSelection.start, lastSelection.end) : undefined,
           };
         }
+      } else if (type === 'insertLineBreak' || type === 'insertFromPaste' || type === 'insertFromYank') {
+        operation = {
+          type: 'text',
+          action: isSelectRange ? 'text_replace' : 'text_insert',
+          insertedText: type === 'insertLineBreak' ? '\n' : data,
+          selectionBefore: lastSelection,
+          selectionAfter: newSelection,
+          deletedText: isSelectRange ? oldValue.substring(lastSelection.start, lastSelection.end) : undefined,
+        };
       } else if (
         type === 'deleteContentBackward' ||
         type === 'deleteWordBackward' ||
@@ -65,7 +70,6 @@ export default function useCodeInput(lastTextSelectionRef: RefObject<EditorSelec
         // wait until next frame to get the latest selection
         await new Promise<void>((resolve) => {
           setTimeout(() => {
-            const textarea = nativeEvent.target as HTMLTextAreaElement;
             newSelection = { start: textarea.selectionStart, end: textarea.selectionEnd };
             resolve();
           }, 0);
