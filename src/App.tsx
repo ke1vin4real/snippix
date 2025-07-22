@@ -56,7 +56,6 @@ function App() {
         );
 
         setTimeout(() => {
-          console.log(lastTextSelection.start, lastTextSelection.end);
           textarea.selectionStart = lastTextSelection.start;
           textarea.selectionEnd = lastTextSelection.end;
         }, 0);
