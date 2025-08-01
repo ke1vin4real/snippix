@@ -46,6 +46,25 @@ export default function useUndoRedoAction(
               prevCode.substring(selectionAfter.start, selectionAfter.end) +
               prevCode.substring(selectionAfter.end + 1)
             );
+          } else if (action === 'text_dedent_single_line') {
+            return (
+              prevCode.substring(0, operation.offsetStart as number) +
+              operation.deletedText +
+              prevCode.substring(operation.offsetStart as number)
+            );
+          } else if (action === 'text_indent_single_line_single_cursor') {
+            return (
+              prevCode.substring(0, selectionBefore.start) +
+              prevCode.substring(selectionBefore.start + (operation.insertedText as string).length)
+            );
+          } else if (action === 'text_indent_single_line_selection_range') {
+            return (
+              prevCode.substring(0, selectionBefore.start) +
+              operation.deletedText +
+              prevCode.substring(selectionAfter.start)
+            );
+          } else if (action === 'text_indent_dedent_multiple_line') {
+            return operation.textBefore as string;
           }
 
           return prevCode;
@@ -91,7 +110,27 @@ export default function useUndoRedoAction(
               bracketPairs[operation.insertedText as string] +
               prevCode.substring(selectionBefore.end)
             );
+          } else if (action === 'text_dedent_single_line') {
+            return (
+              prevCode.substring(0, operation.offsetStart as number) +
+              prevCode.substring((operation.offsetStart as number) + (operation.deletedText as string).length)
+            );
+          } else if (action === 'text_indent_single_line_single_cursor') {
+            return (
+              prevCode.substring(0, selectionBefore.start) +
+              operation.insertedText +
+              prevCode.substring(selectionBefore.start)
+            );
+          } else if (action === 'text_indent_single_line_selection_range') {
+            return (
+              prevCode.substring(0, selectionBefore.start) +
+              operation.insertedText +
+              prevCode.substring(selectionBefore.end)
+            );
+          } else if (action === 'text_indent_dedent_multiple_line') {
+            return operation.textAfter as string;
           }
+
           return prevCode;
         });
 

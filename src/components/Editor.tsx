@@ -7,6 +7,7 @@ interface Props {
   language: string;
   theme: string;
   selection: EditorSelection;
+  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onChange: (e: React.FormEvent<HTMLTextAreaElement>) => void;
   onCompositionStart: (e: CompositionEvent) => void;
   onCompositionEnd: (e: CompositionEvent) => void;
@@ -22,6 +23,7 @@ export default function Editor({
   language,
   theme,
   onChange,
+  onKeyDown,
   onCompositionStart,
   onCompositionEnd,
   onSelectionChange,
@@ -148,7 +150,9 @@ export default function Editor({
         autoCapitalize="off"
         autoCorrect="off"
         placeholder=""
+        tabIndex={-1}
         onInput={onChange}
+        onKeyDown={onKeyDown}
       />
     </div>
   );
