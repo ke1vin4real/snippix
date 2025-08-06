@@ -120,18 +120,14 @@ export default function ResizableBox({ defaultWidth = 400, children, ref, showRe
       className={`flex-1 min-h-[400px] grid my-[50px] mx-auto grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] place-items-center bg-black`}
     >
       <div className="col-[2] row-[2] self-stretch justify-self-stretch">{children}</div>
-      {showResizer && (
-        <>
-          <Resizer
-            onPointerDown={(e) => handlePointerDown(e, 'e')}
-            className="col-[3] row-[2] transform-[translateX(50%)] cursor-col-resize"
-          />
-          <Resizer
-            onPointerDown={(e) => handlePointerDown(e, 'w')}
-            className="col-[1] row-[2] transform-[translateX(-50%)] cursor-col-resize"
-          />
-        </>
-      )}
+      <Resizer
+        onPointerDown={(e) => handlePointerDown(e, 'e')}
+        className={`col-[3] row-[2] transform-[translateX(50%)] cursor-col-resize ${showResizer ? 'visible' : 'invisible'}`}
+      />
+      <Resizer
+        onPointerDown={(e) => handlePointerDown(e, 'w')}
+        className={`col-[1] row-[2] transform-[translateX(-50%)] cursor-col-resize ${showResizer ? 'visible' : 'invisible'}`}
+      />
     </div>
   );
 }
