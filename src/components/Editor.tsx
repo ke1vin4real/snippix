@@ -48,7 +48,9 @@ export default function Editor({
         loadedLangsRef.current.add(language);
         loadedThemesRef.current.add(theme);
       } catch (error) {
-        throw new Error('Failed to create highlighter:' + error);
+        // TODO: show error message
+        console.error('Failed to create highlighter:' + error);
+        highlighterRef.current = null;
       }
     })();
 
