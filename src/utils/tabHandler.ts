@@ -232,13 +232,9 @@ const handleMultiLineDedent = (lines: string[]) => {
 };
 
 const handleMultiLineIndent = (lines: string[], indentStr: string) => {
-  const startLineOffsetLength = 2;
-  const totalOffsetLength = 2 * lines.length;
-  const newline = lines
-    .map((line) => {
-      return indentStr + line;
-    })
-    .join('\n');
+  const startLineOffsetLength = TAB_INDENT_SIZE;
+  const totalOffsetLength = TAB_INDENT_SIZE * lines.length;
+  const newline = lines.map((line) => indentStr + line).join('\n');
 
   return {
     newline,
